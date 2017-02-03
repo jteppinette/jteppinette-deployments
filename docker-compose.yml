@@ -14,7 +14,7 @@ services:
 
   # PROFESSIONAL SITE
   professional-site:
-    image: professional-site
+    image: jteppinette/professional-site
     environment:
       - VIRTUAL_HOST=localhost,home.localhost
 
@@ -30,13 +30,13 @@ services:
 
   # GO JSON API SEED
   go-json-api-seed:
-    image: go-json-api-seed
+    image: jteppinette/go-json-api-seed
     environment:
       - VIRTUAL_HOST=go-json-api-seed.localhost
 
   # AMP
   amp:
-    image: amp
+    image: jteppinette/amp
     env_file: .env
     environment:
       - VIRTUAL_HOST=amp.localhost
@@ -50,7 +50,7 @@ services:
 
   # DJANGO API SEED
   django-api-seed:
-    image: django-api-seed
+    image: jteppinette/django-api-seed
     env_file: .env
     environment:
       - VIRTUAL_HOST=django-api-seed.localhost
@@ -60,7 +60,7 @@ services:
       - db
 
   angular-seed:
-    image: angular-seed
+    image: jteppinette/angular-seed
     environment:
       - VIRTUAL_HOST=angular-seed.localhost
     links:
@@ -68,7 +68,7 @@ services:
 
   # RISK MANAGED
   risk-managed:
-    image: risk-managed
+    image: jteppinette/risk-managed
     env_file: .env
     environment:
       - VIRTUAL_HOST=risk-managed.localhost
@@ -81,14 +81,14 @@ services:
 
   # PERAGRIN
   peragrin-client:
-    image: peragrin-client
+    image: jteppinette/peragrin-client
     environment:
       - VIRTUAL_HOST=app.peragrin.localhost
     links:
       - peragrin-api:upstream
 
   peragrin-api:
-    image: peragrin-api
+    image: jteppinette/peragrin-api
     env_file: .env
     environment:
       - VIRTUAL_HOST=api.peragrin.localhost
