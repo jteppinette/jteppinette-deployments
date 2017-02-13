@@ -79,6 +79,19 @@ services:
     volumes:
       - media:/app/media
 
+  # WATER DRAGON
+  water-dragon-api:
+    image: jteppinette/water-dragon-api
+    env_file: .env
+    environment:
+      - VIRTUAL_HOST=api.water-dragon.localhost
+      - DB_NAME=waterdragon
+      - DB_PORT=3306
+    links:
+      - db
+    volumes:
+      - media:/app/media
+
   # PERAGRIN
   peragrin-client:
     image: jteppinette/peragrin-client

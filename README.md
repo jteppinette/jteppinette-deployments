@@ -8,6 +8,7 @@
 * [Django API Seed](http://django-api-seed.jteppinette.com) - [GitHub](http://github.com/jteppinette/django-api-seed)
 * [Angular Seed](http://angular-seed.jteppinette.com) - [GitHub](http://github.com/jteppinette/angular-seed)
 * [Risk Managed](http://risk-managed.jteppinette.com) - [GitHub](http://github.com/jteppinette/risk-managed)
+* [Water Dragon API](http://api.water-dragon.jteppinette.com) - [GitHub](http://github.com/jteppinette/water-dragon-api)
 * [Peragrin API](http://api.peragrin.jteppinette.com) - [GitHub](http://github.com/jteppinette/peragrin-api)
 * [Peragrin Client](http://app.peragrin.jteppinette.com) - [GitHub](http://github.com/jteppinette/peragrin-client)
 
