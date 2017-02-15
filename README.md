@@ -14,8 +14,9 @@
 
 ## Development
 
-1. remove the `jteppinette/` docker registry from each image in `docker-compose.yml`
-2. create the images for each application listed above
+1. `clone <repo-url>` - for each app listed above
+1. `docker build -t <app> <app-dir>` - for each app listed above
+2. `docker-compose -f development.yml up -d --force-recreate`
 3. follow the steps in `Docker and DB Initialization`
 
 ## Usage
@@ -24,23 +25,27 @@
 
 * [docker](https://docs.docker.com/)
 
-### Prepare
+### Docker Compose
 
 1. update the secrets in `.env`
-2. update the `VIRTUAL_HOSTS` in `docker-compose.yml` to reflect the `server_name`
+2. `docker-compose -f production.yml up -d --force-recreate`
 
-### Docker and DB Initialization
+### Database Initialization
 
-* repeat steps 4 & 5 for each `DB_NAME` listed in the `docker-compose.yml` file.
+* Repeat steps 4 & 5 for each `DB_NAME` listed in the `production.yml` file.
+* Notice, some apps use MySQL and others use PostgreSQL. This information can be found in the links section of each service definition.
 
-1. `$ docker-compose up -d --force-recreate`
-2. `$ docker-compose logs db | grep "GENERATED` - get the db root password
-3. `$ docker-compose exec db mysql -u root -p`  - enter the db root password
-4. ` > CREATE DATABASE <db-name>;`
-5. ` > GRANT ALL PRIVILEGES ON <db-name> . * TO 'db'@'%';`
-6. ` > FLUSH PRIVILEGES;`
-7. ` > exit`
+#### MySQL
 
-## TODO:
+1. `$ docker-compose -f production.yml logs mysql | grep "GENERATED` - get the db root password
+2. `$ docker-compose -f production.yml exec mysql mysql -u root -p`  - enter the db root password
+3. ` > CREATE DATABASE <db-name>;`
+4. ` > GRANT ALL PRIVILEGES ON <db-name> . * TO 'db'@'%';`
+5. ` > FLUSH PRIVILEGES;`
+6. ` > exit`
 
-1. add `SESSION_SECRET` to the `.env` file
+#### PostgreSQL
+
+1. `$ docker-compose -f production.yml exec postgresql psql -U postgres`
+2. ` > CREATE DATABASE <db-name> OWNER db;`
+5. ` > \q`
