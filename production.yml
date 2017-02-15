@@ -3,21 +3,41 @@ volumes:
   postgresqldata:
   mysqldata:
   media:
+  proxy-certs:
+  proxy-vhost.d:
+  proxy-html:
 services:
 
-  # PROXY
-  proxy:
+  # NGINX PROXY
+  nginx-proxy:
     image: jwilder/nginx-proxy
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - proxy-certs:/etc/nginx/certs:ro
+      - proxy-vhost.d:/etc/nginx/vhost.d
+      - proxy-html:/usr/share/nginx/html
     ports: 
       - 80:80
+      - 443:443
+
+  # LETS ENCRYPT
+  lets-encrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - proxy-certs:/etc/nginx/certs:rw
+      - proxy-vhost.d:/etc/nginx/vhost.d
+      - proxy-html:/usr/share/nginx/html
 
   # PROFESSIONAL SITE
   professional-site:
     image: jteppinette/professional-site
     environment:
       - VIRTUAL_HOST=jteppinette.com,home.jteppinette.com
+      - LETSENCRYPT_HOST=jteppinette.com,home.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
 
   # POSTGRESQL
   postgresql:
@@ -44,6 +64,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=go-json-api-seed.jteppinette.com
+      - LETSENCRYPT_HOST=go-json-api-seed.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - DB_NAME=gojsonapiseed
       - DB_PORT=5432
     links:
@@ -55,6 +77,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=amp.jteppinette.com
+      - LETSENCRYPT_HOST=amp.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - APP_URL=amp.jteppinette.com
       - DB_NAME=amp
       - DB_PORT=3306
@@ -69,6 +93,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=django-api-seed.jteppinette.com
+      - LETSENCRYPT_HOST=django-api-seed.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - DB_NAME=djangoapiseed
       - DB_PORT=3306
     links:
@@ -87,6 +113,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=risk-managed.jteppinette.com
+      - LETSENCRYPT_HOST=risk-managed.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - DB_NAME=riskmanaged
       - DB_PORT=3306
     links:
@@ -100,6 +128,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=api.water-dragon.jteppinette.com
+      - LETSENCRYPT_HOST=api.water-dragon.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - DB_NAME=waterdragon
       - DB_PORT=3306
     links:
@@ -112,6 +142,8 @@ services:
     image: jteppinette/peragrin-client
     environment:
       - VIRTUAL_HOST=app.peragrin.jteppinette.com
+      - LETSENCRYPT_HOST=app.peragrin.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
     links:
       - peragrin-api:upstream
 
@@ -120,6 +152,8 @@ services:
     env_file: .env
     environment:
       - VIRTUAL_HOST=api.peragrin.jteppinette.com
+      - LETSENCRYPT_HOST=api.peragrin.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
       - DB_NAME=peragrin
       - DB_PORT=3306
     links:
