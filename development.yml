@@ -124,3 +124,8 @@ services:
       - DB_PORT=3306
     links:
       - mysql:db
+
+  peragrin-home:
+    image: peragrin-home
+    environment:
+      - VIRTUAL_HOST=peragrin.localhost

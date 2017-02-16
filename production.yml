@@ -158,3 +158,10 @@ services:
       - DB_PORT=3306
     links:
       - mysql:db
+
+  peragrin-home:
+    image: jteppinette/peragrin-home
+    environment:
+      - VIRTUAL_HOST=peragrin.localhost
+      - LETSENCRYPT_HOST=peragrin.jteppinette.com
+      - LETSENCRYPT_EMAIL=josheppinette@icloud.com
