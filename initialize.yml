@@ -1,0 +1,134 @@
+---
+
+- hosts: "{{ env }}:&swarm:&swarm-worker-zero"
+  vars:
+    databases:
+      - amp
+      - djangoapiseed
+      - gojsonapiseed
+      - riskmanaged
+      - waterdragon
+  tasks:
+    - name: Register Postgres Container ID
+      command: docker ps --filter name=postgres -q
+      register: postgres_container_id
+      changed_when: False
+
+    - name: Postgres Container ID
+      debug: msg={{ postgres_container_id.stdout }}
+
+    - name: Check Postgres Databases
+      shell: docker exec {{ postgres_container_id.stdout }} psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = '{{ item }}'" | grep -q 1
+      with_items: "{{ databases }}"
+      register: task
+      failed_when: task.stderr != ""
+
+    - name: Initialize Postgres Databases
+      shell: docker exec {{ postgres_container_id.stdout }} psql -U postgres -c 'CREATE DATABASE {{ item.item }} OWNER db'
+      when: item.rc == 1
+      with_items: "{{ task.results }}"
+
+- hosts: "{{ env }}:&swarm:&worker"
+  vars:
+    apps:
+      - amp
+      - django-api-seed
+      - go-json-api-seed
+      - risk-managed
+      - water-dragon-api
+  tasks:
+
+    # AMP
+    - name: Register AMP Container ID
+      command: docker ps --filter name=amp -q
+      register: id
+      changed_when: False
+      run_once: True
+
+    - name: AMP Container ID
+      debug: msg={{ id.stdout }}
+      run_once: True
+
+    - name: Migrate AMP
+      shell: docker exec {{ id.stdout }} python manage.py migrate
+      run_once: True
+
+    - name: Create AMP Fixture Data
+      shell: docker exec {{ id.stdout }} python manage.py createfixturedata -f
+      run_once: True
+
+    # DJANGO API SEED
+    - name: Register Django API Seed Container ID
+      command: docker ps --filter name=django-api-seed -q
+      register: id
+      changed_when: False
+      run_once: True
+
+    - name: Django API Seed Container ID
+      debug: msg={{ id.stdout }}
+      run_once: True
+
+    - name: Migrate Django API Seed
+      shell: docker exec {{ id.stdout }} python manage.py migrate
+      run_once: True
+
+    - name: Create Django API Seed Fixture Data
+      shell: docker exec {{ id.stdout }} python manage.py createfixturedata -f
+      run_once: True
+
+    # GO JSON API SEED
+    - name: Register Go JSON API Seed Container ID
+      command: docker ps --filter name=go-json-api-seed -q
+      register: id
+      changed_when: False
+      run_once: True
+
+    - name: Go JSON API Seed Container ID
+      debug: msg={{ id.stdout }}
+      run_once: True
+
+    - name: Migrate Go JSON API Seed
+      shell: docker exec {{ id.stdout }} go-json-api-seed migrate
+      run_once: True
+
+    - name: Create Go JSON API Seed Fixture Data
+      shell: docker exec {{ id.stdout }} go-json-api-seed createfixturedata
+      run_once: True
+
+    # RISK MANAGED
+    - name: Register Risk Managed Seed Container ID
+      command: docker ps --filter name=risk-managed -q
+      register: id
+      changed_when: False
+      run_once: True
+
+    - name: Risk Managed Container ID
+      debug: msg={{ id.stdout }}
+      run_once: True
+
+    - name: Migrate Risk Managed
+      shell: docker exec {{ id.stdout }} python manage.py migrate
+      run_once: True
+
+    - name: Create Risk Managed Fixture Data
+      shell: docker exec {{ id.stdout }} python manage.py createfixturedata -f
+      run_once: True
+
+    # WATER DRAGON API
+    - name: Register Water Dragon API Container ID
+      command: docker ps --filter name=water-dragon-api -q
+      register: id
+      changed_when: False
+      run_once: True
+
+    - name: Water Dragon API Container ID
+      debug: msg={{ id.stdout }}
+      run_once: True
+
+    - name: Migrate Water Dragon API
+      shell: docker exec {{ id.stdout }} python manage.py migrate
+      run_once: True
+
+    - name: Create Water Dragon API Fixture Data
+      shell: docker exec {{ id.stdout }} python manage.py createfixturedata -f
+      run_once: True

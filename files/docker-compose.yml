@@ -1,0 +1,268 @@
+---
+
+version: "3.1"
+
+volumes:
+  postgres:
+  minio:
+
+networks:
+
+  traefik:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  professional:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  amp:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  api-seed:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  go-json-api-seed:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  risk-managed:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+  water-dragon:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+
+services:
+
+  # TRAEFIK
+  traefik:
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    image: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/jteppinette/acme.json:/acme.json
+      - /etc/jteppinette/traefik.toml:/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+      - professional
+      - amp
+      - api-seed
+      - go-json-api-seed
+      - risk-managed
+      - water-dragon
+
+  # POSTGRESQL
+  postgresql:
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+          - node.labels.postgres == true
+    image: postgres:9.6.2
+    networks:
+      - go-json-api-seed
+      - amp
+      - risk-managed
+      - water-dragon
+      - api-seed
+    env_file: .env
+    environment:
+      - POSTGRES_USER=db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  # MINIO
+  minio:
+    image: minio/minio
+    env_file: .env
+    command: server /data
+    networks:
+      - traefik
+      - amp
+      - risk-managed
+      - water-dragon
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=9000"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:minio.{{ domain }}"
+        - "traefik.frontend.passHostHeader=true"
+      placement:
+        constraints:
+          - node.role == worker
+          - node.labels.minio == true
+    volumes:
+      - minio:/data
+
+  # PROFESSIONAL
+  professional-site:
+    image: jteppinette/professional-site
+    networks:
+      - traefik
+      - professional
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  # AMP
+  amp:
+    image: jteppinette/amp
+    networks:
+      - traefik
+      - amp
+    env_file: .env
+    environment:
+      - APP_URL=amp.{{ domain }}
+      - DB_NAME=amp
+      - DB_PORT=5432
+      - DB_HOST=postgresql
+      - MINIO_SERVER=minio.{{ domain }}
+      - MINIO_BUCKET=amp
+      - MINIO_SECURE=true
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:amp.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  # API SEED
+  django-api-seed:
+    image: jteppinette/django-api-seed
+    networks:
+      traefik:
+      api-seed:
+        aliases:
+          - upstream
+    env_file: .env
+    environment:
+      - DB_NAME=djangoapiseed
+      - DB_PORT=5432
+      - DB_HOST=postgresql
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:django-api-seed.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  angular-seed:
+    image: jteppinette/angular-seed
+    networks:
+      - traefik
+      - api-seed
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:angular-seed.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  # GO JSON API SEED
+  go-json-api-seed:
+    image: jteppinette/go-json-api-seed
+    networks:
+      - traefik
+      - go-json-api-seed
+    env_file: .env
+    environment:
+      - DB_NAME=gojsonapiseed
+      - DB_PORT=5432
+      - DB_HOST=postgresql
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:go-json-api-seed.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  # RISK MANAGED
+  risk-managed:
+    image: jteppinette/risk-managed
+    networks:
+      - traefik
+      - risk-managed
+    env_file: .env
+    environment:
+      - DB_NAME=riskmanaged
+      - DB_PORT=5432
+      - DB_HOST=postgresql
+      - MINIO_SERVER=minio.{{ domain }}
+      - MINIO_BUCKET=risk-managed
+      - MINIO_SECURE=true
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:risk-managed.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker
+
+  # WATER DRAGON
+  water-dragon-api:
+    image: jteppinette/water-dragon-api
+    networks:
+      - traefik
+      - water-dragon
+    env_file: .env
+    environment:
+      - DB_NAME=waterdragon
+      - DB_PORT=5432
+      - DB_HOST=postgresql
+      - MINIO_SERVER=minio.{{ domain }}
+      - MINIO_BUCKET=water-dragon
+      - MINIO_SECURE=true
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:api.water-dragon.{{ domain }}"
+      placement:
+        constraints:
+          - node.role == worker

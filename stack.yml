@@ -1,0 +1,65 @@
+---
+
+- hosts: "{{ env }}:&swarm:&manager"
+  vars: 
+    - domain: '{% if env == "prod" %}jteppinette.com{% else %}{{ env }}.jteppinette.com{% endif %}'
+  tasks:
+    - name: Create /etc/jteppinette Directory
+      file:
+        path: /etc/jteppinette
+        state: directory
+
+    - name: Create acme.json File
+      file:
+        path: /etc/jteppinette/acme.json
+        state: touch
+        mode: 0700
+
+    - name: Template Files
+      template:
+        src: files/{{ item }}
+        dest: /etc/jteppinette/{{ item }}
+        mode: 0700
+      with_items:
+        - docker-compose.yml
+        - traefik.toml
+
+    - name: Generate Database Password
+      shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20 ; echo '' 
+      register: database_password
+
+    - name: Generate Minio Access Key
+      shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20 ; echo '' 
+      register: minio_access_key
+
+    - name: Generate Minio Secret Key
+      shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20 ; echo '' 
+      register: minio_secret_key
+
+    - name: Generate Session Secret
+      shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 20 ; echo '' 
+      register: session_secret
+
+    - name: Template .env File
+      template:
+        src: files/secrets.env
+        dest: ~/.env
+        force: no
+        backup: true
+        mode: 0700
+
+    - name: Deploy Stack
+      command: docker stack deploy -c /etc/jteppinette/docker-compose.yml jteppinette
+      register: result
+
+    - name: Deploy Stack Report
+      debug: msg={{result.stdout_lines}}
+      ignore_errors: True
+
+    - name: Stack Services
+      command: docker stack services jteppinette
+      register: result
+
+    - name: Stack Services Report
+      debug: msg={{result.stdout_lines}}
+      ignore_errors: True
