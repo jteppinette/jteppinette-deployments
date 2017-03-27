@@ -1,8 +1,8 @@
 ---
 
-- hosts: "{{ env }}:&swarm:&manager"
+- hosts: "swarm:&manager"
   vars: 
-    - domain: '{% if env == "prod" %}jteppinette.com{% else %}{{ env }}.jteppinette.com{% endif %}'
+    - domain: 'jteppinette.com'
   tasks:
     - name: Create /etc/jteppinette Directory
       file:

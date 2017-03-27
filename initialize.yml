@@ -1,6 +1,6 @@
 ---
 
-- hosts: "{{ env }}:&swarm:&swarm-worker-zero"
+- hosts: "swarm:&swarm-worker-zero"
   vars:
     databases:
       - amp
@@ -28,7 +28,7 @@
       when: item.rc == 1
       with_items: "{{ task.results }}"
 
-- hosts: "{{ env }}:&swarm:&worker"
+- hosts: "swarm:&worker"
   vars:
     apps:
       - amp

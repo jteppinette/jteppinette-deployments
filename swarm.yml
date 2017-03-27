@@ -1,6 +1,6 @@
 ---
 
-- hosts: "{{ env }}:&swarm:&manager"
+- hosts: "swarm:&manager"
   tasks:
     - name: Node Swarm Status
       command: docker system info -f {% raw %}{{.Swarm.LocalNodeState}}{% endraw %}
@@ -19,9 +19,9 @@
     - name: Worker Join Token
       debug: msg={{ worker_join_token.stdout }}
 
-- hosts: "{{ env }}:&swarm:&worker"
+- hosts: "swarm:&worker"
   vars:
-    - manager: '{{ (groups[env] | intersect(groups["swarm"]) | intersect(groups["manager"]))[0] }}'
+    - manager: '{{ (groups["swarm"] | intersect(groups["manager"]))[0] }}'
   tasks:
     - name: Node Swarm Status
       command: docker system info -f {% raw %}{{.Swarm.LocalNodeState}}{% endraw %}
@@ -32,7 +32,7 @@
       command: docker swarm join --token {{ hostvars[manager]["worker_join_token"]["stdout"] }} --advertise-addr {{ hostvars[inventory_hostname]["do_private_ip_address"] }} {{ hostvars[manager]["do_private_ip_address"] }}:2377
       when: '"inactive" in node_swarm_status.stdout'
 
-- hosts: "{{ env }}:&swarm:&manager"
+- hosts: "swarm:&manager"
   tasks:
     - name: Add Worker Labels
       command: docker node update --label-add {{ item }}=true swarm-worker-zero

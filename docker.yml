@@ -1,6 +1,6 @@
 ---
 
-- hosts: "{{ env }}:&swarm"
+- hosts: "swarm"
   tasks:
     - name: Install Packages
       apt: name={{ item }} state=present
