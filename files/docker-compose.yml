@@ -244,7 +244,7 @@ services:
 
   # WATER DRAGON
   water-dragon-api:
-    image: jteppinette/water-dragon-api
+    image: registry.gitlab.com/jteppinette/water-dragon-api
     networks:
       - traefik
       - water-dragon
