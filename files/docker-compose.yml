@@ -131,7 +131,7 @@ services:
 
   # AMP
   amp:
-    image: jteppinette/amp
+    image: registry.gitlab.com/jteppinette/amp
     networks:
       - traefik
       - amp
