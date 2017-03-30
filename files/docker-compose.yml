@@ -180,7 +180,7 @@ services:
           - node.role == worker
 
   angular-seed:
-    image: jteppinette/angular-seed
+    image: registry.gitlab.com/jteppinette/angular-seed
     networks:
       - traefik
       - api-seed
