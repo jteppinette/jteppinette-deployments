@@ -197,7 +197,7 @@ services:
 
   # GO JSON API SEED
   go-json-api-seed:
-    image: jteppinette/go-json-api-seed
+    image: registry.gitlab.com/jteppinette/go-json-api-seed
     networks:
       - traefik
       - go-json-api-seed
@@ -219,7 +219,7 @@ services:
 
   # RISK MANAGED
   risk-managed:
-    image: jteppinette/risk-managed
+    image: registry.gitlab.com/jteppinette/risk-managed
     networks:
       - traefik
       - risk-managed
