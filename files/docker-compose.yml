@@ -157,7 +157,7 @@ services:
 
   # API SEED
   django-api-seed:
-    image: jteppinette/django-api-seed
+    image: registry.gitlab.com/jteppinette/django-api-seed
     networks:
       traefik:
       api-seed:
