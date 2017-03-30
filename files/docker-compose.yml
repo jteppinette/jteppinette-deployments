@@ -114,7 +114,7 @@ services:
 
   # PROFESSIONAL
   professional-site:
-    image: jteppinette/professional-site
+    image: registry.gitlab.com/jteppinette/professional-site
     networks:
       - traefik
       - professional

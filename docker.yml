@@ -27,3 +27,7 @@
     - name: Install Docker CE
       apt:
         name: docker-ce=17.03.0~ce-0~ubuntu-xenial
+
+    - name: Registry Login
+      command: docker login -u jteppinette -p {{ registry_password }} registry.gitlab.com
+      when: registry_password is not undefined
