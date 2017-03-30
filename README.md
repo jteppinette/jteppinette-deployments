@@ -27,7 +27,7 @@ $ ansible-playbook -u root -i digitalocean.py stack.yml                         
 $ ansible-playbook -u root -i digitalocean.py initialize.yml                                                    # Initialize database migrations and create fixture data.
 ```
 
-## TODO:
+## TODO
 There is an issue with starting up a service that requires an image from a private registry. It is currently failing with a `cannot find image` error.
 
 We may need to do an initial pull on all private registry images on all servers.
