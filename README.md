@@ -2,13 +2,12 @@
 
 ## Applications
 
-* [Professional Site](http://jteppinette.com) - [GitHub](https://github.com/jteppinette/professional-site)
-* [Go JSON API Seed](http://go-json-api-seed.jteppinette.com) - [GitHub](https://github.com/jteppinette/go-json-api-seed)
-* [AMP](http://amp.jteppinette.com) - [GitHub](https://github.com/jteppinette/amp)
-* [Django API Seed](http://django-api-seed.jteppinette.com) - [GitHub](https://github.com/jteppinette/django-api-seed)
-* [Angular Seed](http://angular-seed.jteppinette.com) - [GitHub](https://github.com/jteppinette/angular-seed)
-* [Risk Managed](http://risk-managed.jteppinette.com) - [GitHub](https://github.com/jteppinette/risk-managed)
-* [Water Dragon API](http://api.water-dragon.jteppinette.com) - [GitHub](https://github.com/jteppinette/water-dragon-api)
+* https://github.com/jteppinette/go-json-api-seed
+* https://github.com/jteppinette/amp
+* https://github.com/jteppinette/django-api-seed
+* https://github.com/jteppinette/angular-seed
+* https://github.com/jteppinette/risk-managed
+* https://github.com/jteppinette/water-dragon-api
 
 ## Use
 
