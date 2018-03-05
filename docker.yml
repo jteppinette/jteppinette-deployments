@@ -29,5 +29,5 @@
         name: docker-ce=17.03.0~ce-0~ubuntu-xenial
 
     - name: Registry Login
-      command: docker login -u jteppinette -p {{ registry_password }} registry.gitlab.com
+      command: docker login -u jteppinette -p {{ registry_password }}
       when: registry_password is not undefined
