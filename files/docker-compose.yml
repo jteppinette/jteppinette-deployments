@@ -13,11 +13,6 @@ networks:
     driver_opts:
       encrypted: ""
 
-  professional:
-    driver: overlay
-    driver_opts:
-      encrypted: ""
-
   amp:
     driver: overlay
     driver_opts:
@@ -61,7 +56,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - traefik
-      - professional
       - amp
       - api-seed
       - go-json-api-seed
@@ -111,23 +105,6 @@ services:
           - node.labels.minio == true
     volumes:
       - minio:/data
-
-  # PROFESSIONAL
-  professional-site:
-    image: professional-site
-    networks:
-      - traefik
-      - professional
-    deploy:
-      mode: global
-      labels:
-        - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.docker.network=traefik"
-        - "traefik.frontend.rule=Host:{{ domain }}"
-      placement:
-        constraints:
-          - node.role == worker
 
   # AMP
   amp:
